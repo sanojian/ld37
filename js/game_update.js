@@ -21,23 +21,25 @@ GameState.prototype.update = function() {
   if (g_game.leftKey.isDown) {
     g_game.vacuum.body.velocity.x = -g_game.vacuumSpeed;
     g_game.vacuum.body.velocity.y = 0;
+    g_game.vacuum.scale.x = -1;
   }
   else if (g_game.rightKey.isDown) {
     g_game.vacuum.body.velocity.x = g_game.vacuumSpeed;
     g_game.vacuum.body.velocity.y = 0;
+    g_game.vacuum.scale.x = 1;
   }
+
+  g_game.fragiles.forEach(function(fragile) {
+    if (fragile.y - fragile.customProps.oy > 16) {
+      fragile.body.data.gravityScale = 0;
+      fragile.body.velocity.x = 0;
+      fragile.body.velocity.y = 0;
+      fragile.body.angularVelocity = 0;
+    }
+  });
 
   //g_game.vacuum.x += g_game.vacuum.customProps.speed * g_game.vacuum.customProps.dirX;
   //g_game.vacuum.y += g_game.vacuum.customProps.speed * g_game.vacuum.customProps.dirY;
-  g_game.vacuum.y = Math.max(g_game.vacuum.y, 64);
+  //g_game.vacuum.body.y = Math.max(g_game.vacuum.body.y, 64);
+  //g_game.vacuum.body.angle = 0;
 };
-
-function vacuumDirt(vacuum, dirt) {
-  dirt.destroy();
-}
-
-function hitFurniture(vacuum, furniture) {
-  furniture.x += g_game.vacuum.customProps.speed * g_game.vacuum.customProps.dirX;
-  furniture.y += g_game.vacuum.customProps.speed * g_game.vacuum.customProps.dirY;
-  furniture.y = Math.max(furniture.y, 64);
-}

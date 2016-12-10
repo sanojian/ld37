@@ -5,8 +5,9 @@ g_game.spriteAtlas.assets = {
 	frames: {
     dirt: { frame: { x: 0, y: 0, w: 4, h: 4 } },
     vacuum: { frame: { x: 0, y: 4, w: 16, h: 16 } },
-    table: { frame: { x: 0, y: 20, w: 24, h: 24 } },
-    lamp: { frame: { x: 0, y: 44, w: 4, h: 8 } },
+    table: { frame: { x: 0, y: 20, w: 24, h: 20 } },
+    sofa: { frame: { x: 24, y: 20, w: 48, h: 20 } },
+    lamp: { frame: { x: 0, y: 40, w: 8, h: 8 } },
 	}
 };
 
