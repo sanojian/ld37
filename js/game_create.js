@@ -11,9 +11,14 @@ GameState.prototype.create = function() {
   this.game.physics.startSystem(Phaser.Physics.P2JS);
   this.game.physics.p2.gravity.y = 400;
 
+  g_game.sfx.tick = this.game.add.audio('tick');
+  g_game.sfx.explosion = this.game.add.audio('explosion');
+  g_game.sfx.vacuum = this.game.add.audio('vacuum');
+  g_game.sfx.vacuum.loop = true;
+  g_game.sfx.vacuum.play();
+
   this.game.add.image(0, 0, 'background');
 
-  g_game.fragiles = this.game.add.group();
   g_game.dirt = this.game.add.group();
 
   var playerGroup = g_game.playerGroup = this.game.physics.p2.createCollisionGroup();
@@ -71,8 +76,11 @@ GameState.prototype.create = function() {
   timer1.repeat(1000, g_game.timeLeft, drawClock, this);
   timer1.start();
 
-  g_game.vacuum = this.game.add.sprite(100, 100, 'assets', 'vacuum');
+  //g_game.vacuum = this.game.add.sprite(100, 100, 'assets', 'vacuum');
+  g_game.vacuum = this.game.add.sprite(level.vacuum.x, level.vacuum.y, 'vacuumMove');
   g_game.vacuum.anchor.setTo(0.5);
+  g_game.vacuum.animations.add('walk', [0, 1]);
+  g_game.vacuum.animations.play('walk', 8, true);
   this.game.physics.p2.enable(g_game.vacuum);
   g_game.vacuum.body.setCircle(g_game.vacuum.width/2);
   g_game.vacuum.body.collideWorldBounds = true;
@@ -113,6 +121,7 @@ GameState.prototype.create = function() {
     furniture.body.collides([playerGroup, fragileGroup, wallGroup, dirtGroup, furnitureGroup]);
   }
 
+  g_game.fragiles = this.game.add.group();
   for (i=0; i<level.fragiles.length; i++) {
     var fragile = this.game.add.sprite(level.fragiles[i].x, level.fragiles[i].y, 'assets', level.fragiles[i].sprite);
     fragile.anchor.setTo(0.5);
@@ -139,6 +148,10 @@ GameState.prototype.create = function() {
     g_game.fragiles.add(fragile);
   }
 
+  g_game.particleEmitter = this.game.add.emitter(0, 0, 100);
+  g_game.particleEmitter.makeParticles('assets', 'particle');
+  g_game.particleEmitter.gravity = 1;
+
   initNewspaper(this.game);
 
   g_game.upKey = this.game.input.keyboard.addKey(Phaser.Keyboard.UP);
@@ -149,7 +162,10 @@ GameState.prototype.create = function() {
 };
 
 function contactDirt(target) {
+  if (!g_game.gameOver) {
+    g_game.sfx.tick.play();
     this.destroy();
+  }
 }
 
 function drawClock() {

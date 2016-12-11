@@ -62,8 +62,8 @@ window.g_game = {
 	scale: 10,
 	masterVolume: 0,//.3,
 	gravity: 200,      // pixels/second/second
-  currentLevel: 2,
-  maxLevel: 2,
+  currentLevel: 3,
+  maxLevel: 4,
 	sfx: {},
 	vacuumSpeed: 200
 };
@@ -71,7 +71,7 @@ window.g_game = {
 
 g_game.rooms = {
 	1: {
-		vacuum: { x: 20, y: 150},
+		vacuum: { x: 100, y: 100},
     time: 15,
 		furniture: [
       { sprite: 'sofa', x: 180, y: 60 }
@@ -87,12 +87,12 @@ g_game.rooms = {
     ],
     titles: [
       { headLine: 'Party at Three', sub: 'Some doofus\nhaving party'},
-      { headLine: 'Party at Three', sub: 'Could be the\nevent of year'}
+      { headLine: 'Party at Three', sub: 'Slow year\nin news'}
     ],
 		music: 'squiggy'
 	},
   2: {
-    vacuum: { x: 20, y: 150},
+    vacuum: { x: 100, y: 100},
     time: 20,
     dirt: 100,
     furniture: [
@@ -100,17 +100,70 @@ g_game.rooms = {
       { sprite: 'sofa', x: 120, y: 120 }
     ],
     fragiles: [
-      { sprite: 'lamp', x: 200, y: 80 }
+      { sprite: 'lamp', x: 190, y: 80 }
     ],
     failMessages: [
-      { headLine: 'Party a Failure', sub: 'Guests\ndisgusted'}
+      { headLine: 'Party a Failure', sub: 'Guests\ndisgusted'},
+      { headLine: 'Party a Failure', sub: 'House\ncondemned'}
     ],
     winMessages: [
       { headLine: 'Party Success!', sub: 'Good time\nby everyone'}
     ],
     titles: [
-      { headLine: 'Big Party 3pm', sub: 'Some doofus\nhaving party'},
-      { headLine: 'Big Party 3pm', sub: 'Could be the\nevent of year'}
+      { headLine: 'Big Party 3pm', sub: 'Neighborhood\nexcited'},
+      { headLine: 'Big Party 3pm', sub: 'Not sure why\nthis is news'}
+    ],
+    music: 'squiggy'
+  },
+  4: {
+    vacuum: { x: 180, y: 60},
+    time: 20,
+    dirt: 200,
+    furniture: [
+      { sprite: 'table', x: 40, y: 80 },
+      { sprite: 'table', x: 40, y: 120 },
+      { sprite: 'sofa', x: 90, y: 100 }
+    ],
+    fragiles: [
+      { sprite: 'lamp', x: 30, y: 60 },
+      { sprite: 'statue', x: 38, y: 60 },
+      { sprite: 'lamp', x: 34, y: 100 }
+    ],
+    failMessages: [
+      { headLine: 'Party a Failure', sub: 'Guests\ndisgusted'},
+      { headLine: 'Party a Failure', sub: 'House\ncondemned'}
+    ],
+    winMessages: [
+      { headLine: 'Game won!', sub: 'Sorry no\nwin screen'}
+    ],
+    titles: [
+      { headLine: 'Grand Gala at 3', sub: 'President\ninvited'},
+      { headLine: 'Grand Gala at 3', sub: 'Could be the\nevent of year'}
+    ],
+    music: 'squiggy'
+  },
+  3: {
+    vacuum: { x: 180, y: 60},
+    time: 15,
+    dirt: 200,
+    furniture: [
+      { sprite: 'sofa', x: 34, y: 100 },
+      { sprite: 'sofa', x: 90, y: 100 },
+      { sprite: 'sofa', x: 144, y: 100 },
+      { sprite: 'sofa', x: 194, y: 100 }
+    ],
+    fragiles: [
+    ],
+    failMessages: [
+      { headLine: 'Party a Failure', sub: 'Guests\ndisgusted'},
+      { headLine: 'Party a Failure', sub: 'House\ncondemned'}
+    ],
+    winMessages: [
+      { headLine: 'Clean party!', sub: 'Nobody looked\nunder sofa'}
+    ],
+    titles: [
+      { headLine: '3pm Block party', sub: 'Neighborhood\nexcited'},
+      { headLine: '3pm Block party', sub: 'Could be a\nbig event'}
     ],
     music: 'squiggy'
   }
@@ -129,9 +182,14 @@ GameState.prototype.create = function() {
   this.game.physics.startSystem(Phaser.Physics.P2JS);
   this.game.physics.p2.gravity.y = 400;
 
+  g_game.sfx.tick = this.game.add.audio('tick');
+  g_game.sfx.explosion = this.game.add.audio('explosion');
+  g_game.sfx.vacuum = this.game.add.audio('vacuum');
+  g_game.sfx.vacuum.loop = true;
+  g_game.sfx.vacuum.play();
+
   this.game.add.image(0, 0, 'background');
 
-  g_game.fragiles = this.game.add.group();
   g_game.dirt = this.game.add.group();
 
   var playerGroup = g_game.playerGroup = this.game.physics.p2.createCollisionGroup();
@@ -189,8 +247,11 @@ GameState.prototype.create = function() {
   timer1.repeat(1000, g_game.timeLeft, drawClock, this);
   timer1.start();
 
-  g_game.vacuum = this.game.add.sprite(100, 100, 'assets', 'vacuum');
+  //g_game.vacuum = this.game.add.sprite(100, 100, 'assets', 'vacuum');
+  g_game.vacuum = this.game.add.sprite(level.vacuum.x, level.vacuum.y, 'vacuumMove');
   g_game.vacuum.anchor.setTo(0.5);
+  g_game.vacuum.animations.add('walk', [0, 1]);
+  g_game.vacuum.animations.play('walk', 8, true);
   this.game.physics.p2.enable(g_game.vacuum);
   g_game.vacuum.body.setCircle(g_game.vacuum.width/2);
   g_game.vacuum.body.collideWorldBounds = true;
@@ -231,6 +292,7 @@ GameState.prototype.create = function() {
     furniture.body.collides([playerGroup, fragileGroup, wallGroup, dirtGroup, furnitureGroup]);
   }
 
+  g_game.fragiles = this.game.add.group();
   for (i=0; i<level.fragiles.length; i++) {
     var fragile = this.game.add.sprite(level.fragiles[i].x, level.fragiles[i].y, 'assets', level.fragiles[i].sprite);
     fragile.anchor.setTo(0.5);
@@ -257,6 +319,10 @@ GameState.prototype.create = function() {
     g_game.fragiles.add(fragile);
   }
 
+  g_game.particleEmitter = this.game.add.emitter(0, 0, 100);
+  g_game.particleEmitter.makeParticles('assets', 'particle');
+  g_game.particleEmitter.gravity = 1;
+
   initNewspaper(this.game);
 
   g_game.upKey = this.game.input.keyboard.addKey(Phaser.Keyboard.UP);
@@ -267,7 +333,10 @@ GameState.prototype.create = function() {
 };
 
 function contactDirt(target) {
+  if (!g_game.gameOver) {
+    g_game.sfx.tick.play();
     this.destroy();
+  }
 }
 
 function drawClock() {
@@ -331,8 +400,16 @@ GameState.prototype.update = function() {
 };
 
 function runoverFragile(target) {
-  if (target.sprite === g_game.vacuum) {
-    loseGame();
+  if (!g_game.gaveOver && target.sprite === g_game.vacuum) {
+    g_game.gameOver = true;
+    g_game.sfx.explosion.play();
+    g_game.particleEmitter.x = this.x;
+    g_game.particleEmitter.y = this.y;
+    g_game.particleEmitter.start(true, 2000, null, 5);
+    g_game.vacuum.body.velocity.x = 0;
+    g_game.vacuum.body.velocity.y = 0;
+    target.game.time.events.add(Phaser.Timer.SECOND * 2, loseGame, this);
+
   }
 }
 
@@ -377,6 +454,7 @@ function startGame() {
 
 function winGame() {
 
+  g_game.sfx.vacuum.stop();
   var level = g_game.rooms[g_game.currentLevel];
   var news = level.winMessages[Math.floor(Math.random() * level.winMessages.length)];
 
@@ -396,6 +474,7 @@ function winGame() {
 
 function loseGame() {
 
+  g_game.sfx.vacuum.stop();
   var level = g_game.rooms[g_game.currentLevel];
   var news = level.failMessages[Math.floor(Math.random() * level.failMessages.length)];
 
@@ -418,11 +497,15 @@ SplashScreen.prototype = {
 		this.load.image('preloaderBar', 'assets/gfx/loading-bar.png');
     this.load.image('newspaper', 'assets/gfx/newspaper.png');
 
+    this.game.load.spritesheet('vacuumMove', 'assets/gfx/vacuum.png', 16, 16);
+
 		this.load.atlasJSONHash('assets', 'assets/gfx/sprites.png', null, g_game.spriteAtlas.assets);
 		//this.load.atlasJSONHash('ui', 'assets/gfx/ui.png', null, g_game.spriteAtlas.ui);
 		this.load.bitmapFont('pressStart2p', 'assets/fonts/pressStart2p_0.png', 'assets/fonts/pressStart2p.xml');
 
-		//this.game.load.audio('drive', ['assets/audio/sfx/drive.wav']);
+    this.game.load.audio('tick', ['assets/audio/sfx/tick.wav']);
+    this.game.load.audio('vacuum', ['assets/audio/sfx/vacuum.wav']);
+    this.game.load.audio('explosion', ['assets/audio/sfx/Explosion.wav']);
 
 		//this.game.load.audio('squiggy', ['https://dl.dropboxusercontent.com/u/102070389/ld32/squiggy.OGG']);
 
@@ -448,11 +531,13 @@ g_game.spriteAtlas = {};
 
 g_game.spriteAtlas.assets = {
 	frames: {
-    dirt: { frame: { x: 0, y: 0, w: 4, h: 4 } },
+    dirt: { frame: { x: 0, y: 0, w: 2, h: 2 } },
+    particle: { frame: { x: 22, y: 0, w: 5, h: 4 } },
     vacuum: { frame: { x: 0, y: 4, w: 16, h: 16 } },
     table: { frame: { x: 0, y: 20, w: 24, h: 20 } },
     sofa: { frame: { x: 24, y: 20, w: 48, h: 20 } },
     lamp: { frame: { x: 0, y: 40, w: 8, h: 12 } },
+    statue: { frame: { x: 8, y: 40, w: 17, h: 12 } },
     clock: { frame: { x: 0, y: 52, w: 31, h: 31 } },
     clockHands: { frame: { x: 8, y: 84, w: 20, h: 20 } },
     secondHand: { frame: { x: 0, y: 84, w: 5, h: 26 } },

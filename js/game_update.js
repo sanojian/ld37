@@ -45,7 +45,15 @@ GameState.prototype.update = function() {
 };
 
 function runoverFragile(target) {
-  if (target.sprite === g_game.vacuum) {
-    loseGame();
+  if (!g_game.gaveOver && target.sprite === g_game.vacuum) {
+    g_game.gameOver = true;
+    g_game.sfx.explosion.play();
+    g_game.particleEmitter.x = this.x;
+    g_game.particleEmitter.y = this.y;
+    g_game.particleEmitter.start(true, 2000, null, 5);
+    g_game.vacuum.body.velocity.x = 0;
+    g_game.vacuum.body.velocity.y = 0;
+    target.game.time.events.add(Phaser.Timer.SECOND * 2, loseGame, this);
+
   }
 }

@@ -39,6 +39,7 @@ function startGame() {
 
 function winGame() {
 
+  g_game.sfx.vacuum.stop();
   var level = g_game.rooms[g_game.currentLevel];
   var news = level.winMessages[Math.floor(Math.random() * level.winMessages.length)];
 
@@ -58,6 +59,7 @@ function winGame() {
 
 function loseGame() {
 
+  g_game.sfx.vacuum.stop();
   var level = g_game.rooms[g_game.currentLevel];
   var news = level.failMessages[Math.floor(Math.random() * level.failMessages.length)];
 

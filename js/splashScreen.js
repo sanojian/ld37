@@ -5,11 +5,15 @@ SplashScreen.prototype = {
 		this.load.image('preloaderBar', 'assets/gfx/loading-bar.png');
     this.load.image('newspaper', 'assets/gfx/newspaper.png');
 
+    this.game.load.spritesheet('vacuumMove', 'assets/gfx/vacuum.png', 16, 16);
+
 		this.load.atlasJSONHash('assets', 'assets/gfx/sprites.png', null, g_game.spriteAtlas.assets);
 		//this.load.atlasJSONHash('ui', 'assets/gfx/ui.png', null, g_game.spriteAtlas.ui);
 		this.load.bitmapFont('pressStart2p', 'assets/fonts/pressStart2p_0.png', 'assets/fonts/pressStart2p.xml');
 
-		//this.game.load.audio('drive', ['assets/audio/sfx/drive.wav']);
+    this.game.load.audio('tick', ['assets/audio/sfx/tick.wav']);
+    this.game.load.audio('vacuum', ['assets/audio/sfx/vacuum.wav']);
+    this.game.load.audio('explosion', ['assets/audio/sfx/Explosion.wav']);
 
 		//this.game.load.audio('squiggy', ['https://dl.dropboxusercontent.com/u/102070389/ld32/squiggy.OGG']);
 
