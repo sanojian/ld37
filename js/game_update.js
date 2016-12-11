@@ -1,15 +1,16 @@
 GameState.prototype.update = function() {
 
-  if (g_game.dirt.length === 0) {
-    console.log('win');
+  if (g_game.dirt.length === 0 && !g_game.gameOver) {
+    winGame();
     return;
   }
 
-  //this.game.physics.p2.collide(g_game.vacuum, g_game.dirt, vacuumDirt);
-//  this.game.physics.p2.collide(g_game.vacuum, g_game.furniture, hitFurniture);
-  //this.game.physics.p2.collide(g_game.furniture, g_game.fragiles);
-
-  if (g_game.upKey.isDown) {
+  if (g_game.gameOver && g_game.spaceKey.isDown) {
+    this.game.state.start('Splash');
+  }
+  else if (g_game.gameOver) {
+  }
+  else if (g_game.upKey.isDown) {
     g_game.vacuum.body.velocity.x = 0;
     g_game.vacuum.body.velocity.y = -g_game.vacuumSpeed;
   }
@@ -35,11 +36,16 @@ GameState.prototype.update = function() {
       fragile.body.velocity.x = 0;
       fragile.body.velocity.y = 0;
       fragile.body.angularVelocity = 0;
+      // make collidable with player
+      fragile.body.collides([g_game.furnitureGroup, g_game.wallGroup, g_game.playerGroup]);
+      fragile.body.data.shapes[0].sensor = true;
+      fragile.body.onBeginContact.add(runoverFragile, fragile);
     }
   });
-
-  //g_game.vacuum.x += g_game.vacuum.customProps.speed * g_game.vacuum.customProps.dirX;
-  //g_game.vacuum.y += g_game.vacuum.customProps.speed * g_game.vacuum.customProps.dirY;
-  //g_game.vacuum.body.y = Math.max(g_game.vacuum.body.y, 64);
-  //g_game.vacuum.body.angle = 0;
 };
+
+function runoverFragile(target) {
+  if (target.sprite === g_game.vacuum) {
+    loseGame();
+  }
+}

@@ -7,7 +7,10 @@ g_game.spriteAtlas.assets = {
     vacuum: { frame: { x: 0, y: 4, w: 16, h: 16 } },
     table: { frame: { x: 0, y: 20, w: 24, h: 20 } },
     sofa: { frame: { x: 24, y: 20, w: 48, h: 20 } },
-    lamp: { frame: { x: 0, y: 40, w: 8, h: 8 } },
+    lamp: { frame: { x: 0, y: 40, w: 8, h: 12 } },
+    clock: { frame: { x: 0, y: 52, w: 31, h: 31 } },
+    clockHands: { frame: { x: 8, y: 84, w: 20, h: 20 } },
+    secondHand: { frame: { x: 0, y: 84, w: 5, h: 26 } },
 	}
 };
 
