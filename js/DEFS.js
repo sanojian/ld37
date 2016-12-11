@@ -11,7 +11,7 @@ window.g_game = {
 	scale: 10,
 	masterVolume: 0,//.3,
 	gravity: 200,      // pixels/second/second
-  currentLevel: 3,
+  currentLevel: 1,
   maxLevel: 4,
 	sfx: {},
 	vacuumSpeed: 200
