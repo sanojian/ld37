@@ -325,6 +325,12 @@ GameState.prototype.create = function() {
 
   initNewspaper(this.game);
 
+  this.game.input.keyboard.addKeyCapture([
+    Phaser.Keyboard.LEFT,
+    Phaser.Keyboard.RIGHT,
+    Phaser.Keyboard.UP,
+    Phaser.Keyboard.DOWN
+  ]); 
   g_game.upKey = this.game.input.keyboard.addKey(Phaser.Keyboard.UP);
   g_game.downKey = this.game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
   g_game.leftKey = this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
